@@ -12,6 +12,8 @@ var dotenv = require('dotenv');
 var Instagram = require('instagram-node-lib');
 var mongoose = require('mongoose');
 var app = express();
+// below are facebook passport setup
+var FacebookStrategy = require('passport-facebook').Strategy;
 
 //local dependencies
 var models = require('./models');
@@ -48,6 +50,19 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
+// FACEBOOK PASSPORT SETUP
+passport.use(new FacebookStrategy({
+    clientID: FACEBOOK_APP_ID,
+    clientSecret: FACEBOOK_APP_SECRET,
+    callbackURL: "http://www.example.com/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOrCreate(..., function(err, user) {
+      if (err) { return done(err); }
+      done(null, user);
+    });
+  }
+));
 
 // Use the InstagramStrategy within Passport.
 //   Strategies in Passport require a `verify` function, which accept
@@ -146,6 +161,11 @@ app.get('/photos', ensureAuthenticated, function(req, res){
     }
   });
 });
+
+
+app.get('/auth/facebook',passport.authenticate('facebook'));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/login'}));
+
 
 
 // GET /auth/instagram
