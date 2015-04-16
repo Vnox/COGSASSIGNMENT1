@@ -13,7 +13,7 @@ var Instagram = require('instagram-node-lib');
 var mongoose = require('mongoose');
 var app = express();
 // below are facebook passport setup
-// var FacebookStrategy = require('passport-facebook').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 
 //local dependencies
 var models = require('./models');
