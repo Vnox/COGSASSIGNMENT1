@@ -14,6 +14,8 @@ var mongoose = require('mongoose');
 var app = express();
 // below are facebook passport setup
 var FacebookStrategy = require('passport-facebook').Strategy;
+// below are fbmodule 
+var graph = require('fbgraph');
 
 //local dependencies
 var models = require('./models');
@@ -26,6 +28,9 @@ var INSTAGRAM_CALLBACK_URL = process.env.INSTAGRAM_CALLBACK_URL;
 var INSTAGRAM_ACCESS_TOKEN = "";
 Instagram.set('client_id', INSTAGRAM_CLIENT_ID);
 Instagram.set('client_secret', INSTAGRAM_CLIENT_SECRET);
+// take facebook info from .env
+var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 
 //connect to database
 mongoose.connect(process.env.MONGODB_CONNECTION_URL);
@@ -50,19 +55,21 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-// // FACEBOOK PASSPORT SETUP
-// passport.use(new FacebookStrategy({
-//     clientID: FACEBOOK_APP_ID,
-//     clientSecret: FACEBOOK_APP_SECRET,
-//     callbackURL: "http://www.example.com/auth/facebook/callback"
-//   },
-//   function(accessToken, refreshToken, profile, done) {
-//     User.findOrCreate(..., function(err, user) {
-//       if (err) { return done(err); }
-//       done(null, user);
-//     });
-//   }
-// ));
+// FACEBOOK PASSPORT SETUP
+passport.use(new FacebookStrategy({
+    clientID: FACEBOOK_APP_ID,
+    clientSecret: FACEBOOK_APP_SECRET,
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // set access token
+    graph.setAccessToken(accessToken);
+    models.User.findOrCreate({}, function(err, user) {
+      if (err) { return done(err); }
+      done(null, user);
+    });
+  }
+));
 
 // Use the InstagramStrategy within Passport.
 //   Strategies in Passport require a `verify` function, which accept
@@ -80,6 +87,7 @@ passport.use(new InstagramStrategy({
       "id": profile.id,
       "access_token": accessToken 
     }, function(err, user, created) {
+
       
       // created will be true here
       models.User.findOrCreate({}, function(err, user, created) {
@@ -95,6 +103,8 @@ passport.use(new InstagramStrategy({
     });
   }
 ));
+
+
 
 //Configures the Template engine
 app.engine('handlebars', handlebars({defaultLayout: 'layout'}));
@@ -125,7 +135,8 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
-//routes
+
+//routes  QAQ
 app.get('/', function(req, res){
   res.render('login');
 });
@@ -138,12 +149,26 @@ app.get('/account', ensureAuthenticated, function(req, res){
   res.render('account', {user: req.user});
 });
 
+app.get('/fbaccount', ensureAuthenticated, function(req, res){
+  res.render('fbaccount', {user: req.user});
+  // STAR TFROM HERE (graph.xxxxx.xxx)  
+  // console.log()
+});
+
+app.get('/fbdetail', ensureAuthenticated, function(req, res){
+  res.render('fbdetail', {user: req.user});
+});
+
+
+
+
 app.get('/photos', ensureAuthenticated, function(req, res){
   var query  = models.User.where({ name: req.user.username });
   query.findOne(function (err, user) {
     if (err) return handleError(err);
     if (user) {
       // doc may be null if no document matched
+      // !!!!!!!! START FROM HERE !!!!!!!!!!!
       Instagram.users.liked_by_self({
         access_token: user.access_token,
         complete: function(data) {
@@ -155,6 +180,14 @@ app.get('/photos', ensureAuthenticated, function(req, res){
             //insert json object into image array
             return tempJSON;
           });
+          // yong hu xin xi
+
+          
+          // whatever else you want 
+
+      // Instagram.get('/users/user-id', function(req, res){
+      //   console.log(res);
+      // });
           res.render('photos', {photos: imageArr});
         }
       }); 
@@ -163,10 +196,19 @@ app.get('/photos', ensureAuthenticated, function(req, res){
 });
 
 
-// app.get('/auth/facebook',passport.authenticate('facebook'));
-// app.get('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/login'}));
+// Facebook authentication afterwards
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook'),
+  function(req, res){
+    // The request will be redirected to Instagram for authentication, so this
+    // function will not be called.
+  });
 
 
+app.get('/auth/facebook/callback', 
+  passport.authenticate('facebook', { successRedirect: '/fbaccount',
+                                      failureRedirect: '/login' }));
 
 // GET /auth/instagram
 //   Use passport.authenticate() as route middleware to authenticate the
@@ -188,7 +230,7 @@ app.get('/auth/instagram',
 app.get('/auth/instagram/callback', 
   passport.authenticate('instagram', { failureRedirect: '/login'}),
   function(req, res) {
-    res.redirect('/account');
+    res.redirect('/photos');
   });
 
 app.get('/logout', function(req, res){

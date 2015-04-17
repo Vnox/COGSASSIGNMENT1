@@ -1,13 +1,10 @@
-
-
-
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Login</title>
+    <title>Facebook Hub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css" media="screen">
         @import url(http://fonts.googleapis.com/css?family=Varela+Round);
@@ -73,21 +70,10 @@
             margin: -40px 0 0;
         }
 
-        #assignemnt{
-        	padding-top: 0;
-        	font-size: 13px;
-        }
-
-        #hithere{
-        	color: #000;
-        	font-size: 22px;
-        	padding-top: 5px;
-        }
-
         ul {
             list-style-type: none;
             padding: 0;
-            margin: 10px 0 0;
+            margin: 40px 0 0;
         }
 
         li {
@@ -108,16 +94,10 @@
         }
     </style>
 </head>
-<body><div id="profile">
+<body><div id="error"> COGS121 Assignment 1 - Facebook Hub</div><img src="http://i.imgur.com/VKKm0pn.png" alt="Magnifying Glass" id="searchIcon">
 
-    <img src="http://i.imgur.com/KMi72wU.png" alt="Avatar" id="avatar">
-    <p id="hithere">Hi, there !</p>
-    <p id="assignemnt">- COGS121 Assignment 1 by Shuangli Zhou -</p>
-
-    <ul>
-        <li><a href="/auth/instagram"> Login With Instagram </a></li>
-        <li><a href="/auth/facebook"> Login With Facebook </a></li>
-    </ul>
-
-</div></body>
+<form action="/fbdetail">
+    <input type="text" placeholder="Enter the tag ... Meow " id="username" name="username">
+    <input type="submit" value="Search Tag" class="button">
+</form></body>
 </html>
