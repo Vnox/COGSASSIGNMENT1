@@ -82,6 +82,7 @@ passport.use(new InstagramStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
+
     models.User.findOrCreate({
       "name": profile.username,
       "id": profile.id,
@@ -101,6 +102,7 @@ passport.use(new InstagramStrategy({
         });
       })
     });
+     console.log(profile.id);
   }
 ));
 
@@ -163,16 +165,54 @@ app.get('/fbdetail', ensureAuthenticated, function(req, res){
 
 
 app.get('/photos', ensureAuthenticated, function(req, res){
+
+
+
   var query  = models.User.where({ name: req.user.username });
   query.findOne(function (err, user) {
     if (err) return handleError(err);
     if (user) {
+
+ 
       // doc may be null if no document matched
       // !!!!!!!! START FROM HERE !!!!!!!!!!!
+
+      // Instagram.users.get('/users/user-id', function(req, res){
+      //   console.log(res);
+      // });
+        // Instagram.users.info({
+        //   access_token: user.access_token,
+        //   complete: function(data) {
+
+            
+
+        //   }});
+      
+      Instagram.users.info({ user_id: user.id, 
+        complete: function(data) {
+
+          picture = data.profile_picture;
+          myusername = data.username;
+          followc = data.counts.follows;
+          followerc = data.counts.followed_by
+
+
+
+          return picture, myusername, followc, followerc
+          
+          }
+      });
+
+
+
+
+
       Instagram.users.liked_by_self({
         access_token: user.access_token,
         complete: function(data) {
           //Map will iterate through the returned data obj
+
+
           var imageArr = data.map(function(item) {
             //create temporary json object
             tempJSON = {};
@@ -182,14 +222,12 @@ app.get('/photos', ensureAuthenticated, function(req, res){
           });
           // yong hu xin xi
 
-          
           // whatever else you want 
 
-      // Instagram.get('/users/user-id', function(req, res){
-      //   console.log(res);
-      // });
-          res.render('photos', {photos: imageArr});
+      
+          res.render('photos', {photos: imageArr, mypic: picture, myname: myusername, friends: followc, fler:followerc} );
         }
+
       }); 
     }
   });

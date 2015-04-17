@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Treehouse Profile</title>
+    <title>Instagram Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css" media="screen">
         @import url(http://fonts.googleapis.com/css?family=Varela+Round);
@@ -15,7 +15,7 @@
             background: #ECEEEF;
             text-align: center;
             margin: 100px auto;
-            max-width: 462px;
+            max-width: 762px;
             padding: 0 40px;
             font: 18px normal 'Varela Round', Helvetica, serif;
             color: #777B7E;
@@ -26,7 +26,7 @@
         }
 
         #searchIcon, #avatar {
-            width: 50%;
+            width: 30%;
             border-radius: 50%;
             margin: 0 25% 0 25%;
         }
@@ -47,21 +47,6 @@
             margin: 20px 0 0;
         }
 
-        .button {
-            border-color: #5FB6E1;
-            background: #5FB6E1;
-            color: #fff;
-        }
-
-        #error {
-            width: 100%;
-            padding: 22px 0;
-            background: #FFE6B2;
-            color: #C5A14E;
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
 
         #profile {
             background: #fff;
@@ -71,10 +56,14 @@
             margin: -40px 0 0;
         }
 
+        #profilename{
+            font-size: 28px;
+        }
+
         ul {
             list-style-type: none;
             padding: 0;
-            margin: 40px 0 0;
+            margin: 10px 0 0;
         }
 
         li {
@@ -85,6 +74,7 @@
             border-top: 1px solid #D5DDE4;
         }
 
+
         a, a:visited {
             color: #5FB6E1;
             text-decoration: none;
@@ -92,23 +82,33 @@
 
         span {
             color: #2C3238;
+
         }
+
+
     </style>
 </head>
 <body><div id="profile">
 
-    <img src="http://i.imgur.com/KMi72wU.png" alt="Avatar" id="avatar">
+    <img src={{mypic}} alt="Avatar" id="avatar">
 
-    <p><span>@Leon</span></p>
-
+    <p><span> Hey, you are logged in as </span></p>
+    <p id="profilename"><span>@ {{myname}}</span></p>
+    <p><span>You currently have {{fler}} followers and {{friends}} friends !</span></p>
     <ul>
         <li><span>Below are your liked</span> photos ... Meow</li>
         {{#each photos}}
   			<img src="{{url}}" class="img-responsive" class="img hashtag-img">
+            <p></p>
 		{{/each}}
         <li><span>Still reading your</span> other information</li>
         <li><a href="/"> Go Back </a></li>
     </ul>
 
-</div></body>
+</div>
+<div id="moreinfo">  lll </div>
+
+
+
+</body>
 </html>
