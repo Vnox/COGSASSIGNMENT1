@@ -210,19 +210,15 @@ app.get('/photos', ensureAuthenticated, function(req, res){
       Instagram.users.liked_by_self({
         access_token: user.access_token,
         complete: function(data) {
-          //Map will iterate through the returned data obj
-
 
           var imageArr = data.map(function(item) {
             //create temporary json object
             tempJSON = {};
             tempJSON.url = item.images.low_resolution.url;
+            tempJSON.cap = item.caption.text;
             //insert json object into image array
             return tempJSON;
           });
-          // yong hu xin xi
-
-          // whatever else you want 
 
       
           res.render('photos', {photos: imageArr, mypic: picture, myname: myusername, friends: followc, fler:followerc} );

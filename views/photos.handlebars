@@ -60,6 +60,10 @@
             font-size: 28px;
         }
 
+        #captions{
+            padding: 10px 10px 10px 10px;
+        }
+
         ul {
             list-style-type: none;
             padding: 0;
@@ -97,16 +101,17 @@
     <p><span>You currently have {{fler}} followers and {{friends}} friends !</span></p>
     <ul>
         <li><span>Below are your liked</span> photos ... Meow</li>
+
         {{#each photos}}
   			<img src="{{url}}" class="img-responsive" class="img hashtag-img">
-            <p></p>
+            <p id="captions">{{ cap }}</p> 
 		{{/each}}
+
         <li><span>Still reading your</span> other information</li>
         <li><a href="/"> Go Back </a></li>
     </ul>
 
-</div>
-<div id="moreinfo">  lll </div>
+
 
 
 
