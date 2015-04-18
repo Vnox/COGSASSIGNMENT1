@@ -64,6 +64,9 @@
             padding: 10px 10px 10px 10px;
         }
 
+
+
+
         ul {
             list-style-type: none;
             padding: 0;
@@ -89,6 +92,15 @@
 
         }
 
+        #btn{
+            margin-bottom: 10px;
+        }
+
+        #sorry{
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
 
     </style>
 </head>
@@ -105,9 +117,12 @@
         {{#each photos}}
   			<img src="{{url}}" class="img-responsive" class="img hashtag-img">
             <p id="captions">{{ cap }}</p> 
+            <button id="btn" type="button" onclick="myFunction()" > Meow </button>
+
+
 		{{/each}}
 
-        <li><span>Still reading your</span> other information</li>
+        <li id = "sorry"><span> We tried to implement the </span> like button function however it seems like wen dont have enough access to that function api.  TAT </li>
         <li><a href="/"> Go Back </a></li>
     </ul>
 

@@ -31,7 +31,6 @@ Instagram.set('client_secret', INSTAGRAM_CLIENT_SECRET);
 // take facebook info from .env
 var FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 var FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
-var FACEBOOK_CALLBACKURL = process.env.FACEBOOK_CALLBACKURL;
 
 //connect to database
 mongoose.connect(process.env.MONGODB_CONNECTION_URL);
@@ -60,53 +59,17 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: FACEBOOK_CALLBACKURL
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect..
-
-
-    models.User.findOrCreate({
-      "name": profile.displayName,
-      "id": profile.id,
-      "access_token": accessToken 
-    }, function(err, user, created) {
-
-      
-      // created will be true here
-      models.User.findOrCreate({}, function(err, user, created) {
-        // created will be false here
-        process.nextTick(function () {
-
-          // To keep the example simple, the user's Instagram profile is returned to
-          // represent the logged-in user.  In a typical application, you would want
-          // to associate the Instagram account with a user record in your database,
-          // and return that user instead.
-          return done(null, profile);
-        });
-      })
+    // set access token
+    graph.setAccessToken(accessToken);
+    models.User.findOrCreate({}, function(err, user) {
+      if (err) { return done(err); }
+      done(null, user);
     });
   }
 ));
-//   function(accessToken, refreshToken, profile, done) {
-//     // set access token
-//     // console.log(profile.displayName)
-//     models.User.findOrCreate({
-//       "fbname": profile.displayName,
-//       "fbid": profile.id,
-//       "access_token": accessToken 
-//     }, function(err, user) {
-//       if (err) { return done(err); }
-//       done(null, user);
-//     });
-//   }
-// ));
-
-
-
-
-
-
 
 // Use the InstagramStrategy within Passport.
 //   Strategies in Passport require a `verify` function, which accept
@@ -139,6 +102,7 @@ passport.use(new InstagramStrategy({
         });
       })
     });
+     //console.log(profile.id);
   }
 ));
 
@@ -194,36 +158,7 @@ app.get('/fbaccount', ensureAuthenticated, function(req, res){
 });
 
 app.get('/fbdetail', ensureAuthenticated, function(req, res){
-
-   var query  = models.User.where({ name: req.user.displayName });
-    query.findOne(function (err, user) {
-    if (err) return handleError(err);
-    if (user) {
-            console.log("FOUND");
-            console.log(user.name);
-             graph.setAccessToken(user.access_token);
-             var myid = user.id;
-
-             graph.get(
-    "/user/birthday",
-    function (response) {
-      if (response && !response.error) {
-        /* handle the result */
-        console.log(response)
-      }
-      });
-
-
-
-
-             return myid;
-
-      
-        }
-
-      });
-  res.render('fbdetail', {user: req.user });
-  
+  res.render('fbdetail', {user: req.user});
 });
 
 
@@ -238,6 +173,20 @@ app.get('/photos', ensureAuthenticated, function(req, res){
     if (err) return handleError(err);
     if (user) {
 
+ 
+      // doc may be null if no document matched
+      // !!!!!!!! START FROM HERE !!!!!!!!!!!
+
+      // Instagram.users.get('/users/user-id', function(req, res){
+      //   console.log(res);
+      // });
+        // Instagram.users.info({
+        //   access_token: user.access_token,
+        //   complete: function(data) {
+
+            
+
+        //   }});
       
       Instagram.users.info({ user_id: user.id, 
         complete: function(data) {
@@ -253,6 +202,8 @@ app.get('/photos', ensureAuthenticated, function(req, res){
           
           }
       });
+
+
 
 
 
@@ -292,7 +243,7 @@ app.get('/auth/facebook',
 
 
 app.get('/auth/facebook/callback', 
-  passport.authenticate('facebook', { successRedirect: '/fbdetail',
+  passport.authenticate('facebook', { successRedirect: '/fbaccount',
                                       failureRedirect: '/login' }));
 
 // GET /auth/instagram
